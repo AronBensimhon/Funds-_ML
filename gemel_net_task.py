@@ -1,5 +1,4 @@
 import pandas as pd
-from datetime import timedelta
 
 
 def preprocessing(df):
@@ -20,7 +19,7 @@ def preprocessing(df):
     # Checking again for missing values:
     # print(indentify_missing_values(df))  # todo : uncomment
 
-    # Filling the NaN values with median:
+    # Filling the NaN values with median for relevant features:
     df[['AVG_ANNUAL_MANAGEMENT_FEE', 'MONTHLY_YIELD', 'YEAR_TO_DATE_YIELD']] = df[
         ['AVG_ANNUAL_MANAGEMENT_FEE', 'MONTHLY_YIELD', 'YEAR_TO_DATE_YIELD']
     ].fillna(df[['AVG_ANNUAL_MANAGEMENT_FEE', 'MONTHLY_YIELD', 'YEAR_TO_DATE_YIELD']].median())
@@ -30,16 +29,23 @@ def preprocessing(df):
     df['INCEPTION_DATE'] = pd.to_datetime(df['INCEPTION_DATE'], errors='coerce')
     df['REPORT_PERIOD'] = pd.to_datetime(df['REPORT_PERIOD'].astype(str), format='%Y%m')
 
+    # Filter rows where REPORT_PERIOD is on or after January 1, 2000
+    df = df[df['REPORT_PERIOD'] >= '2020-01-01']
     # Redundant features:
     df = df.drop(columns=['MANAGING_CORPORATION_LEGAL_ID', 'CONTROLLING_CORPORATION'])
 
-    # Creating new column DAYS_PASSED: from creation of קופה to report date
-    # df['YEARS_PASSED'] = (df['REPORT_PERIOD'] - df['INCEPTION_DATE']).dt.days / 365
-    # df['MONTHS_PASSED'] = (df['REPORT_PERIOD'] - df['INCEPTION_DATE']).dt.days / 30
-    # df['DAYS_PASSED'] = (df['REPORT_PERIOD'] - df['INCEPTION_DATE']).dt.days
+    # Creating new column TIME_ELAPSED: from creation of קופה to report date
     df['TIME_ELAPSED'] = (df['REPORT_PERIOD'] - df['INCEPTION_DATE']).dt.days.apply(days_to_years_months_days)
     df = df.sort_values(by=['FUND_NAME', 'REPORT_PERIOD'], ascending=[True, True])
 
+    # Group by MANAGING_CORPORATION and REPORT_PERIOD and sum specified features
+    group_sum_features = ['DEPOSITS', 'WITHDRAWLS', 'INTERNAL_TRANSFERS', 'NET_MONTHLY_DEPOSITS']
+    df_grouped = df.groupby(['FUND_NAME'])[group_sum_features].sum().round(2).reset_index()
+    df_grouped_managing_corp = df.groupby(['MANAGING_CORPORATION'])[group_sum_features].sum().round(2).reset_index()
+
+    features_to_percent= ['STOCK_MARKET_EXPOSURE', 'FOREIGN_EXPOSURE',	'FOREIGN_CURRENCY_EXPOSURE']
+    for feature in features_to_percent:
+        df[f"{feature}_%"] = df[feature] / df['TOTAL_ASSETS']
     return df
 
 
@@ -55,8 +61,6 @@ def days_to_years_months_days(days):
     # If days is NaN or NaT, return 'NaT'
     if pd.isna(days):
         return 'NaT'
-
-    # Otherwise, calculate years, months, and remaining days
     years = days // 365
     months = (days % 365) // 30
     remaining_days = (days % 365) % 30
@@ -67,3 +71,4 @@ if __name__ == '__main__':
     df = pd.read_csv('gemel_net_dataset.csv')
     df_preprocessed = preprocessing(df)
     print(df_preprocessed)
+
