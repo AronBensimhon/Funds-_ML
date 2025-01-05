@@ -1,6 +1,6 @@
 # Funds_ML
 
-Welcome to the **Funds_ML** repository! This project demonstrates a complete machine learning pipeline for classifying and analyzing financial funds data. The primary focus is on preprocessing, feature engineering, and model evaluation, leveraging advanced machine learning models and visualization techniques.
+Welcome to the **Funds_ML** repository! This project demonstrates an end-to-end classification pipeline including an unsupervised analysis of financial funds data. The primary focus is on preprocessing, feature engineering, and model evaluation, leveraging advanced machine learning models and visualization techniques. In a second part you will find a clustering and anomaly detection analysis. 
 
 ## Features
 
