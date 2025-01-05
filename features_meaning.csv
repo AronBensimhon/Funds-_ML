@@ -1,0 +1,33 @@
+Feature,Type,Description
+FUND_ID,Numeric,Unique identifier for the fund.
+FUND_NAME,Text,Name of the fund.
+FUND_CLASSIFICATION,Text,"Classification of the fund (e.g., savings, study funds, investment funds, etc.)."
+CONTROLLING_CORPORATION,Text,Name of the controlling corporation.
+MANAGING_CORPORATION,Text,Name of the managing company.
+REPORT_PERIOD,Numeric,"Reporting period in yyyymm format (e.g., 202312 for December 2023)."
+INCEPTION_DATE,Text,Date the fund was established.
+TARGET_POPULATION,Text,"Target population of the fund (e.g., general public or specific company/sector workers)."
+SPECIALIZATION,Text,"Main investment focus of the fund (e.g., general, stocks, bonds, foreign currency, etc.)."
+SUB_SPECIALIZATION,Text,"Secondary investment focus of the fund (e.g., Israeli stocks, global bonds, government securities, etc.)."
+DEPOSITS,Numeric,Deposits made by employees and self-employed individuals into the fund.
+WITHDRAWALS,Numeric,Withdrawals by employees and self-employed individuals from the fund.
+INTERNAL_TRANSFERS,Numeric,Net transfers between funds (transfers in minus transfers out).
+NET_MONTHLY_DEPOSITS,Numeric,Net accumulation (deposits minus withdrawals +/- transfers).
+TOTAL_ASSETS,Numeric,Total assets of the fund at the end of the reporting period.
+AVG_ANNUAL_MANAGEMENT_FEE,Numeric,Average annual management fee as a percentage of assets.
+AVG_DEPOSIT_FEE,Numeric,Average management fee as a percentage of deposits.
+MONTHLY_YIELD,Numeric,Monthly yield of the fund.
+YEAR_TO_DATE_YIELD,Numeric,Cumulative yield from the beginning of the year.
+YIELD_TRAILING_3_YRS,Numeric,Cumulative yield over the past 3 years.
+YIELD_TRAILING_5_YRS,Numeric,Cumulative yield over the past 5 years.
+AVG_ANNUAL_YIELD_TRAILING_3YRS,Numeric,Average annual yield over the past 3 years.
+AVG_ANNUAL_YIELD_TRAILING_5YRS,Numeric,Average annual yield over the past 5 years.
+STANDARD_DEVIATION,Numeric,Standard deviation of returns over the past 5 years.
+ALPHA,Numeric,Annual alpha calculated based on the fund's monthly yield over the last 60 months.
+SHARPE_RATIO,Numeric,Annual Sharpe ratio calculated based on the fund's monthly yield over the last 60 months relative to a risk-free interest rate.
+LIQUID_ASSETS_PERCENT,Numeric,Percentage of liquid assets in the fund.
+STOCK_MARKET_EXPOSURE,Numeric,Percentage exposure to stocks.
+FOREIGN_EXPOSURE,Numeric,Percentage exposure to foreign investments.
+FOREIGN_CURRENCY_EXPOSURE,Numeric,Percentage exposure to foreign currencies.
+MANAGING_CORPORATION_LEGAL_ID,Numeric,Legal ID of the managing corporation.
+CURRENT_DATE,Text,Current date of the data.
