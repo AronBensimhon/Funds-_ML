@@ -9,6 +9,9 @@ from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.impute import SimpleImputer
 from sklearn.model_selection import GridSearchCV
 from sklearn.svm import SVC
+from sklearn.cluster import KMeans, DBSCAN
+from sklearn.ensemble import IsolationForest
+from sklearn.neighbors import LocalOutlierFactor
 import matplotlib.pyplot as plt
 
 
@@ -21,14 +24,16 @@ def preprocessing(df):
     ]
     df = df.drop(columns=drop_features)  # Drop selected columns
 
-    df = df.dropna(subset=['MONTHLY_YIELD', 'YEAR_TO_DATE_YIELD'], how='all')  # Drop rows with missing essential features
+    df = df.dropna(subset=['MONTHLY_YIELD', 'YEAR_TO_DATE_YIELD'],
+                   how='all')  # Drop rows with missing essential features
 
     num_features = ['AVG_ANNUAL_MANAGEMENT_FEE', 'MONTHLY_YIELD', 'YEAR_TO_DATE_YIELD']  # Numerical features
     df[num_features] = df[num_features].fillna(df[num_features].median())  # Fill missing values with median
 
     df['INCEPTION_DATE'] = pd.to_datetime(df['INCEPTION_DATE'], errors='coerce')  # Convert to datetime
     df['REPORT_PERIOD'] = pd.to_datetime(df['REPORT_PERIOD'].astype(str), format='%Y%m')  # Convert to datetime
-    df['TIME_ELAPSED_YEARS'] = ((df['REPORT_PERIOD'] - df['INCEPTION_DATE']).dt.days.fillna(0)) / 365.25  # Calculate elapsed years
+    df['TIME_ELAPSED_YEARS'] = ((df['REPORT_PERIOD'] - df['INCEPTION_DATE']).dt.days.fillna(
+        0)) / 365.25  # Calculate elapsed years
     df['TIME_ELAPSED_YEARS'] = df['TIME_ELAPSED_YEARS'].fillna(0)  # Fill missing values with 0
 
     df = df.drop(columns=['INCEPTION_DATE', 'REPORT_PERIOD'])  # Drop original date columns
@@ -98,7 +103,8 @@ def display_feature_importance(model, feature_names, top_n=10):
         print(feature_importance_df.head(top_n))
 
         plt.figure(figsize=(10, 6))
-        plt.barh(feature_importance_df['Feature'].head(top_n), feature_importance_df['Importance'].head(top_n))  # Plot top features
+        plt.barh(feature_importance_df['Feature'].head(top_n),
+                 feature_importance_df['Importance'].head(top_n))  # Plot top features
         plt.xlabel("Feature Importance")  # X-axis label
         plt.ylabel("Feature")  # Y-axis label
         plt.title(f"Top {top_n} Influential Features")  # Plot title
@@ -107,6 +113,56 @@ def display_feature_importance(model, feature_names, top_n=10):
         plt.show()
     else:
         print("The provided model does not support feature importance.")  # Print unsupported message
+
+
+def perform_clustering(X):
+    # KMeans clustering
+    kmeans = KMeans(n_clusters=3, n_init=10, random_state=42)  # Initialize KMeans
+    kmeans_labels = kmeans.fit_predict(X)  # Fit and predict clusters
+    kmeans_cluster_counts = pd.Series(kmeans_labels).value_counts()  # Cluster distribution for KMeans
+    print("KMeans Clustering Results:")
+    print(kmeans_cluster_counts)
+
+    # DBSCAN clustering
+    dbscan = DBSCAN(eps=0.5, min_samples=5)  # Initialize DBSCAN
+    dbscan_labels = dbscan.fit_predict(X)  # Fit and predict clusters
+    dbscan_cluster_counts = pd.Series(dbscan_labels).value_counts()  # Cluster distribution for DBSCAN
+    print("\nDBSCAN Clustering Results:")
+    print(dbscan_cluster_counts)
+
+    # Comparison plot for clustering
+    cluster_methods = ['KMeans', 'DBSCAN']
+    cluster_counts = [len(kmeans_cluster_counts), len(dbscan_cluster_counts)]
+    plt.figure(figsize=(8, 5))
+    plt.bar(cluster_methods, cluster_counts, color=['blue', 'orange'])
+    plt.title('Number of Clusters Detected')
+    plt.ylabel('Number of Clusters')
+    plt.show()
+
+
+def perform_anomaly_detection(X):
+    # Isolation Forest for anomaly detection
+    isolation_forest = IsolationForest(contamination=0.05, random_state=42)  # Initialize Isolation Forest
+    isolation_labels = isolation_forest.fit_predict(X)  # Detect anomalies
+    isolation_anomalies = sum(isolation_labels == -1)  # Count anomalies
+    print("Isolation Forest Anomaly Detection Results:")
+    print(f"Number of Anomalies Detected: {isolation_anomalies}")
+
+    # Local Outlier Factor for anomaly detection
+    lof = LocalOutlierFactor(n_neighbors=20, contamination=0.05)  # Initialize LOF
+    lof_labels = lof.fit_predict(X)  # Detect anomalies
+    lof_anomalies = sum(lof_labels == -1)  # Count anomalies
+    print("\nLocal Outlier Factor Anomaly Detection Results:")
+    print(f"Number of Anomalies Detected: {lof_anomalies}")
+
+    # Comparison plot for anomaly detection
+    anomaly_methods = ['Isolation Forest', 'Local Outlier Factor']
+    anomaly_counts = [isolation_anomalies, lof_anomalies]
+    plt.figure(figsize=(8, 5))
+    plt.bar(anomaly_methods, anomaly_counts, color=['green', 'red'])
+    plt.title('Number of Anomalies Detected')
+    plt.ylabel('Number of Anomalies')
+    plt.show()
 
 
 def main():
@@ -168,6 +224,10 @@ def main():
 
     if best_xgboost_model:  # Display feature importance for XGBoost
         display_feature_importance(best_xgboost_model, X.columns)
+
+    ###  UNSUPERVISED ANALYSIS  ###
+    perform_clustering(X_scaled)  # Perform clustering
+    perform_anomaly_detection(X_scaled)  # Perform anomaly detection
 
 
 if __name__ == '__main__':
