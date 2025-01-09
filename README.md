@@ -117,7 +117,7 @@ The scatter plot below visualizes the clusters detected by the DBSCAN algorithm.
 *The DBSCAN clustering visualization highlights four distinct clusters with varying densities, while noise points, represented*
 *in black, are scattered across sparse regions, demonstrating the algorithm's effectiveness in identifying dense groups and outliers.*
 
-As we can see in the following graph:
+Summary of clustering results in the following graph:
 ![Clustering Methods Comparison](graph_results/clusters_comparison.png)
 
 ### Anomaly Detection
