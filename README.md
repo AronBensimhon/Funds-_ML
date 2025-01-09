@@ -83,21 +83,30 @@ The dataset used in this project is from [Data.gov.il](https://info.data.gov.il/
 ## Results and Outputs
 
 ### Classification
+#### Model Performance Comparison
+
+![Model Performance Comparison](graph_results/models_comparison.png)
+
 
 XGBoost was found to be the best-performing model with an accuracy of **98%**.
 The following graph shows the top influential features for the XGBoost model:
 
 ![Feature Importance](graph_results/feature_importance.png)
-- **Fee Bucket**: Classification of management fees.
-- **Sub Specialization of the Fund**: Detailed focus areas of the financial funds.
-- **Time Elapsed in Years**: The duration of the fund's existence.
 
 ### Clustering
 
 Clustering analysis was performed using KMeans, Hierarchical Clustering, and DBSCAN. The results revealed distinct clusters of funds based on their attributes:
+
 - **KMeans** identified 3 optimal clusters based on the Elbow method.
+![Elbow Method](graph_results/elbow_method_res.png)
+
 - **Hierarchical Clustering** provided a dendrogram representation, with similar grouping as KMeans.
+![Hierarchical Clustering Dendrogram](graph_results/hierarchical_dendrogram.png)
+
 - **DBSCAN** detected 3 clusters, excluding noise points, with some outliers detected as noise.
+
+As we can see in the following graph:
+![Clustering Methods Comparison](graph_results/clusters_comparison.png)
 
 ### Anomaly Detection
 
@@ -105,6 +114,10 @@ Anomaly detection using Isolation Forest, Local Outlier Factor (LOF), and One-Cl
 - **Isolation Forest** detected 15 anomalies.
 - **LOF** and **One-Class SVM** identified 10 and 8 anomalies respectively.
 - The anomalies are primarily influenced by unusual values in features such as management fees and fund specialization.
+
+The following graph compares the number of anomalies detected by different methods:
+
+![Anomalies Detected](graph_results/anomalies_res.png)
 
 ## Author
 
