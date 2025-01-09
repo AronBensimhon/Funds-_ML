@@ -84,7 +84,10 @@ The dataset used in this project is from [Data.gov.il](https://info.data.gov.il/
 
 ### Classification
 
-XGBoost was found to be the best-performing model with an accuracy of **98%**. The most influential features identified are:
+XGBoost was found to be the best-performing model with an accuracy of **98%**.
+The following graph shows the top influential features for the XGBoost model:
+
+![Feature Importance](graph_results/feature_importance.png)
 - **Fee Bucket**: Classification of management fees.
 - **Sub Specialization of the Fund**: Detailed focus areas of the financial funds.
 - **Time Elapsed in Years**: The duration of the fund's existence.
