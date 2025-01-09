@@ -49,9 +49,10 @@ Welcome to the **Funds_ML** repository! This project demonstrates an end-to-end 
 
 ## Repository Structure
 
-- `main.py`: Main script containing the pipeline implementation.
+- `classification_pipeline.py`: Main script containing the pipeline implementation.
 - `gemel_net_dataset.csv`: Dataset used for training and testing (not included in the repository; see below for details on dataset usage).
 - `requirements.txt`: List of dependencies required for the project.
+- `feature_meaning.csv` Explanation of each feature appearing in the dataset for better understanding.
 
 ---
 
