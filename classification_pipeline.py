@@ -88,15 +88,15 @@ def plot_comparison(results):
     accuracies = [metrics['accuracy'] for metrics in results.values()]
     f1_scores = [metrics['f1_score'] for metrics in results.values()]
     # ChatGPT: plot config
-    plt.figure(figsize=(10, 6))
-    plt.bar(model_names, accuracies, alpha=0.7, label='Accuracy', width=0.4, align='center')  # Plot accuracies
-    plt.bar(model_names, f1_scores, alpha=0.7, label='F1-Score', width=0.4, align='edge')  # Plot F1 scores
-    plt.xlabel('Model')  # X-axis label
-    plt.ylabel('Score')  # Y-axis label
-    plt.title('Model Performance Comparison')  # Plot title
-    plt.legend()  # Add legend
-    plt.tight_layout()
-    plt.show()
+    # plt.figure(figsize=(10, 6))
+    # plt.bar(model_names, accuracies, alpha=0.7, label='Accuracy', width=0.4, align='center')  # Plot accuracies
+    # plt.bar(model_names, f1_scores, alpha=0.7, label='F1-Score', width=0.4, align='edge')  # Plot F1 scores
+    # plt.xlabel('Model')  # X-axis label
+    # plt.ylabel('Score')  # Y-axis label
+    # plt.title('Model Performance Comparison')  # Plot title
+    # plt.legend()  # Add legend
+    # plt.tight_layout()
+    # plt.show()
 
 
 def display_feature_importance(model, feature_names, top_n=10):
@@ -113,15 +113,15 @@ def display_feature_importance(model, feature_names, top_n=10):
         print("Top Influential Features:")  # Print top features
         print(feature_importance_df.head(top_n))
         # ChatGPT: plot config
-        plt.figure(figsize=(10, 6))
-        plt.barh(feature_importance_df['Feature'].head(top_n),
-                 feature_importance_df['Importance'].head(top_n))  # Plot top features
-        plt.xlabel("Feature Importance")  # X-axis label
-        plt.ylabel("Feature")  # Y-axis label
-        plt.title(f"Top {top_n} Influential Features")  # Plot title
-        plt.gca().invert_yaxis()  # Invert y-axis
-        plt.tight_layout()
-        plt.show()
+        # plt.figure(figsize=(10, 6))
+        # plt.barh(feature_importance_df['Feature'].head(top_n),
+        #          feature_importance_df['Importance'].head(top_n))  # Plot top features
+        # plt.xlabel("Feature Importance")  # X-axis label
+        # plt.ylabel("Feature")  # Y-axis label
+        # plt.title(f"Top {top_n} Influential Features")  # Plot title
+        # plt.gca().invert_yaxis()  # Invert y-axis
+        # plt.tight_layout()
+        # plt.show()
     else:
         print("The provided model does not support feature importance.")
 
@@ -197,13 +197,13 @@ def perform_clustering(X):
 
     # ChatGPT: plot config
     # Plot the Elbow Curve
-    plt.figure(figsize=(8, 5))
-    plt.plot(k_range, wcss, marker='o', linestyle='--')
-    plt.title('Elbow Method: Optimal Number of Clusters')
-    plt.xlabel('Number of Clusters (k)')
-    plt.ylabel('WCSS (Within-Cluster Sum of Squares)')
-    plt.grid()
-    plt.show()
+    # plt.figure(figsize=(8, 5))
+    # plt.plot(k_range, wcss, marker='o', linestyle='--')
+    # plt.title('Elbow Method: Optimal Number of Clusters')
+    # plt.xlabel('Number of Clusters (k)')
+    # plt.ylabel('WCSS (Within-Cluster Sum of Squares)')
+    # plt.grid()
+    # plt.show()
 
     optimal_k = 3  # based on visual inspection of the elbow plot
     print(f"Optimal number of clusters after elbow method evaluation : {optimal_k}")
@@ -216,12 +216,12 @@ def perform_clustering(X):
 
     # ChatGPT: plot config
     # Plot the dendrogram
-    plt.figure(figsize=(10, 6))
-    dendrogram(linkage_matrix)
-    plt.title("Hierarchical Clustering Dendrogram")
-    plt.xlabel("Data Points or Clusters")
-    plt.ylabel("Distance")
-    plt.show()
+    # plt.figure(figsize=(10, 6))
+    # dendrogram(linkage_matrix)
+    # plt.title("Hierarchical Clustering Dendrogram")
+    # plt.xlabel("Data Points or Clusters")
+    # plt.ylabel("Distance")
+    # plt.show()
 
     optimal_threshold = 100  # based on dendrogram inspection
     hierarchical_labels = fcluster(linkage_matrix, t=optimal_threshold, criterion='distance')
@@ -255,12 +255,12 @@ def perform_clustering(X):
     num_clusters = [len(kmeans_cluster_counts), num_clusters_dbscan, num_clusters_hierarchical]
 
     # ChatGPT: plot config
-    plt.figure(figsize=(8, 5))
-    plt.bar(methods, num_clusters, color=['blue', 'orange', 'green'])
-    plt.title('Comparison of Clustering Methods')
-    plt.ylabel('Number of Clusters')
-    plt.xlabel('Clustering Method')
-    plt.show()
+    # plt.figure(figsize=(8, 5))
+    # plt.bar(methods, num_clusters, color=['blue', 'orange', 'green'])
+    # plt.title('Comparison of Clustering Methods')
+    # plt.ylabel('Number of Clusters')
+    # plt.xlabel('Clustering Method')
+    # plt.show()
     return {
         "KMeans": {
             "labels": kmeans_labels,
@@ -311,12 +311,12 @@ def perform_anomaly_detection(X, df):
     anomaly_counts = [isolation_anomalies, lof_anomalies, ocsvm_anomalies]
 
     # ChatGPT: plot config
-    plt.figure(figsize=(8, 5))
-    plt.bar(anomaly_methods, anomaly_counts, color=['green', 'red', 'blue'])
-    plt.title('Number of Anomalies Detected by Each Model')
-    plt.ylabel('Number of Anomalies')
-    plt.xlabel('Anomaly Detection Method')
-    plt.show()
+    # plt.figure(figsize=(8, 5))
+    # plt.bar(anomaly_methods, anomaly_counts, color=['green', 'red', 'blue'])
+    # plt.title('Number of Anomalies Detected by Each Model')
+    # plt.ylabel('Number of Anomalies')
+    # plt.xlabel('Anomaly Detection Method')
+    # plt.show()
 
     print("\nIdentifying Anomalies Using the Best Model")
     best_model = 'Isolation Forest'
