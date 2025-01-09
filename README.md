@@ -99,6 +99,7 @@ Clustering analysis was performed using KMeans, Hierarchical Clustering, and DBS
 
 - **KMeans** identified 3 optimal clusters based on the Elbow method.
 ![Elbow Method](graph_results/elbow_method_res.png)
+The "elbow point" (where the reduction in WCSS becomes less significant) occurs at k=3, indicating that 3 clusters is the optimal choice for this dataset.
 
 - **Hierarchical Clustering** provided a dendrogram representation, with similar grouping as KMeans.
 ![Hierarchical Clustering Dendrogram](graph_results/hierarchical_dendrogram.png)
