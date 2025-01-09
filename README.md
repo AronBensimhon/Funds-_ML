@@ -80,6 +80,29 @@ Ensure you have Python 3.7+ installed along with the following libraries:
 
 The dataset used in this project is from [Data.gov.il](https://info.data.gov.il/home/). It includes features related to financial fund performance, such as management fees, yields, and asset sizes. For privacy and licensing reasons, the dataset is not provided in this repository.
 
+## Results and Outputs
+
+### Classification
+
+XGBoost was found to be the best-performing model with an accuracy of **98%**. The most influential features identified are:
+- **Fee Bucket**: Classification of management fees.
+- **Sub Specialization of the Fund**: Detailed focus areas of the financial funds.
+- **Time Elapsed in Years**: The duration of the fund's existence.
+
+### Clustering
+
+Clustering analysis was performed using KMeans, Hierarchical Clustering, and DBSCAN. The results revealed distinct clusters of funds based on their attributes:
+- **KMeans** identified 3 optimal clusters based on the Elbow method.
+- **Hierarchical Clustering** provided a dendrogram representation, with similar grouping as KMeans.
+- **DBSCAN** detected 3 clusters, excluding noise points, with some outliers detected as noise.
+
+### Anomaly Detection
+
+Anomaly detection using Isolation Forest, Local Outlier Factor (LOF), and One-Class SVM revealed the following insights:
+- **Isolation Forest** detected 15 anomalies.
+- **LOF** and **One-Class SVM** identified 10 and 8 anomalies respectively.
+- The anomalies are primarily influenced by unusual values in features such as management fees and fund specialization.
+
 ## Author
 
 This repository is maintained by **Aron Bensimhon** and **Moshe Goldzand**. If you have any questions or feedback, feel free to contact us through GitHub.
