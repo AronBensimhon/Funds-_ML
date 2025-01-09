@@ -361,39 +361,6 @@ def perform_anomaly_detection(X, df):
     }
 
 
-def debug(X, X_scaled, y):
-    """
-    Quickly trains and evaluates an XGBoost model with the provided optimal parameters.
-    """
-    # Split the data
-    X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.3, random_state=42)
-
-    # Define the XGBoost model with optimal parameters
-    xgb_model = XGBClassifier(
-        random_state=42,
-        eval_metric='mlogloss',
-        learning_rate=0.2,
-        max_depth=7,
-        n_estimators=100
-    )
-
-    # Train the model
-    xgb_model.fit(X_train, y_train)
-
-    # Predict and evaluate
-    y_pred = xgb_model.predict(X_test)
-    accuracy = accuracy_score(y_test, y_pred)
-    f1 = f1_score(y_test, y_pred, average='weighted')
-    report = classification_report(y_test, y_pred)
-
-    # Print results
-    print(f"XGBoost Accuracy: {accuracy:.4f}")
-    print(f"XGBoost F1-Score: {f1:.4f}")
-    print(f"Classification Report:\n{report}\n")
-    display_feature_importance(xgb_model, X.columns)
-    return xgb_model
-
-
 def main():
     df = pd.read_csv('gemel_net_dataset.csv')
 
