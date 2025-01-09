@@ -182,27 +182,17 @@ def perform_classification(X, X_scaled, y):
 
 def perform_clustering(X):
     """
-    1. PCA for dimensionality reduction reducing to 10 components
-    2. Finding the best model based on accuracy
-    3. Display top influencing features
+    1. Testing Kmeans, Hierarchical and DBSCAN
+    2. Finding the best clustering model based on accuracy
+    3. Compare results
     """
-    print("Applying PCA for Dimensionality Reduction")
-    pca = PCA()
-    pca.fit(X)
-    explained_variance = np.cumsum(pca.explained_variance_ratio_)
-    n_components_90 = np.argmax(
-        explained_variance >= 0.90) + 1  # Determine the number of components to retain 90% variance
-    pca = PCA(n_components=n_components_90)  # Apply PCA with the selected number of components
-    X_pca = pca.fit_transform(X)
-    print(f"Data reduced to {n_components_90} components.")
-
     # KMeans
     print("\nPerforming Kmeans Clustering")
     wcss = []  # To store Within-Cluster Sum of Squares
     k_range = range(1, 11)
     for k in k_range:
         kmeans = KMeans(n_clusters=k, random_state=42, n_init=10)
-        kmeans.fit(X_pca)
+        kmeans.fit(X)
         wcss.append(kmeans.inertia_)
 
     # ChatGPT: plot config
@@ -218,17 +208,17 @@ def perform_clustering(X):
     optimal_k = 3  # based on visual inspection of the elbow plot
     print(f"Optimal number of clusters after elbow method evaluation : {optimal_k}")
     kmeans = KMeans(n_clusters=optimal_k, random_state=42, n_init=10)
-    kmeans_labels = kmeans.fit_predict(X_pca)
+    kmeans_labels = kmeans.fit_predict(X)
 
     # Hierarchical
     print("\nPerforming Hierarchical Clustering")
-    linkage_matrix = linkage(X_pca, method='ward')  # Ward's method minimizes variance within clusters
+    linkage_matrix = linkage(X, method='ward')  # Ward's method minimizes variance within clusters
 
     # ChatGPT: plot config
     # Plot the dendrogram
     plt.figure(figsize=(10, 6))
     dendrogram(linkage_matrix)
-    plt.title("Hierarchical Clustering Dendrogram (After PCA)")
+    plt.title("Hierarchical Clustering Dendrogram")
     plt.xlabel("Data Points or Clusters")
     plt.ylabel("Distance")
     plt.show()
@@ -245,7 +235,7 @@ def perform_clustering(X):
     eps = 3  # This value was initially set to 7 then reduced till DBSCAN successfully detected 3 clusters
     min_samples = 10  # Minimum number of samples
     dbscan = DBSCAN(eps=eps, min_samples=min_samples)
-    dbscan_labels = dbscan.fit_predict(X_pca)
+    dbscan_labels = dbscan.fit_predict(X)
     num_clusters_dbscan = len(np.unique(dbscan_labels[dbscan_labels != -1]))  # Exclude noise
     num_noise_points = np.sum(dbscan_labels == -1)
     print(f"DBSCAN: {num_clusters_dbscan} clusters found, {num_noise_points} noise points")
@@ -271,29 +261,37 @@ def perform_clustering(X):
     plt.ylabel('Number of Clusters')
     plt.xlabel('Clustering Method')
     plt.show()
+    return {
+        "KMeans": {
+            "labels": kmeans_labels,
+            "num_clusters": len(kmeans_cluster_counts),
+            "cluster_distribution": kmeans_cluster_counts
+        },
+        "Hierarchical": {
+            "labels": hierarchical_labels,
+            "num_clusters": num_clusters_hierarchical,
+            "cluster_distribution": hierarchical_cluster_counts
+        },
+        "DBSCAN": {
+            "labels": dbscan_labels,
+            "num_clusters": num_clusters_dbscan,
+            "num_noise_points": num_noise_points,
+            "cluster_distribution": dbscan_cluster_counts
+        }
+    }
 
 
 def perform_anomaly_detection(X, df):
     """
     Perform anomaly detection using Isolation Forest, Local Outlier Factor (LOF), and One-Class SVM.
     Results include detection of anomalies, model comparison, and identification of anomalies in the raw dataset.
-
-    Parameters:
-    - X: Scaled dataset for anomaly detection.
-    - df: Original preprocessed dataset for identifying anomalies.
     """
-    print("\nApplying PCA for Visualization")
-    pca = PCA(n_components=2)  # Reduce to 2 components for visualization
-    X_pca = pca.fit_transform(X)
-    print("Data reduced to 2 components for anomaly visualization.")
-
     print("\nPerforming Anomaly Detection")
-
     # Isolation Forest
     isolation_forest = IsolationForest(
         contamination=0.01, max_samples=0.5, n_estimators=50, random_state=42)
     isolation_labels = isolation_forest.fit_predict(X)
-    isolation_anomalies = sum(isolation_labels == -1)
+    isolation_anomalies = sum(isolation_labels == -1)  # ChatGPT: sum anomalies
     print(f"Isolation Forest detected {isolation_anomalies} anomalies.")
 
     # Local Outlier Factor
@@ -321,8 +319,8 @@ def perform_anomaly_detection(X, df):
     plt.show()
 
     print("\nIdentifying Anomalies Using the Best Model")
-    best_model = 'Isolation Forest'  # Example choice (could depend on evaluation metrics or consistency)
-    best_labels = isolation_labels  # Replace with lof_labels or ocsvm_labels if needed
+    best_model = 'Isolation Forest'
+    best_labels = isolation_labels
     anomalies = df[best_labels == -1]
 
     print(f"Best Model for anomaly detection: {best_model}")
@@ -331,7 +329,20 @@ def perform_anomaly_detection(X, df):
     top_features = feature_anomaly_counts.sort_values(ascending=False).head(5).index.tolist()
     print("Features with Most Anomalies:")
     print(top_features)
-    return top_features
+    return {
+        "Isolation Forest": {
+            "anomalies": df[isolation_labels == -1],
+            "num_anomalies": isolation_anomalies
+        },
+        "Local Outlier Factor": {
+            "anomalies": df[lof_labels == -1],
+            "num_anomalies": lof_anomalies
+        },
+        "One-Class SVM": {
+            "anomalies": df[ocsvm_labels == -1],
+            "num_anomalies": ocsvm_anomalies
+        }
+    }
 
 
 def main():
@@ -341,10 +352,8 @@ def main():
     df_preprocessed, label_encoders = preprocessing(df)
     X = df_preprocessed.drop(columns=['FUND_CLASSIFICATION'])
     y = df_preprocessed['FUND_CLASSIFICATION']
-
     imputer = SimpleImputer(strategy="median")  # Handle missing values before fitting
     X_imputed = imputer.fit_transform(X)
-
     scaler = StandardScaler()
     X_scaled = scaler.fit_transform(X_imputed)
 
@@ -352,8 +361,12 @@ def main():
     perform_classification(X, X_scaled, y)
 
     # # # #  UNSUPERVISED ANALYSIS  # # #
-    perform_clustering(X_scaled)
-    perform_anomaly_detection(X_scaled, df_preprocessed)
+    print("\nApplying PCA for Dimensionality Reduction")
+    pca = PCA(n_components=10)
+    X_pca = pca.fit_transform(X_scaled)
+
+    perform_clustering(X_pca)
+    perform_anomaly_detection(X_pca, df_preprocessed)
 
 
 if __name__ == '__main__':
