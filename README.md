@@ -1,20 +1,35 @@
 # Funds_ML
 
-Welcome to the **Funds_ML** repository! This project demonstrates an end-to-end classification pipeline including an unsupervised analysis of financial funds data. The primary focus is on preprocessing, feature engineering, and model evaluation, leveraging advanced machine learning models and visualization techniques. In a second part you will find a clustering and anomaly detection analysis. 
+Welcome to the **Funds_ML** repository! This project processes financial fund data using various machine learning techniques. It focuses on classification, clustering, and anomaly detection workflows, covering an end-to-end machine learning pipeline with both supervised and unsupervised analysis.
 
 ## Features
 
-- **Preprocessing Pipeline**: Handles missing values, irrelevant features, and encodes categorical variables.
-- **Feature Engineering**: Creates new features like time elapsed, fee buckets, and total fees collected.
-- **Model Training and Evaluation**: Includes several classifiers such as Random Forest, XGBoost, Logistic Regression, K-Nearest Neighbors, and Support Vector Machines.
-- **Hyperparameter Optimization**: Uses GridSearchCV to find the best parameters for Random Forest and XGBoost models.
-- **Visualization**:
-  - Comparison of model performance.
-  - Display of influential features for models supporting feature importance.
+This project is organized into several key functions:
+
+### Preprocessing
+
+- **`preprocessing`**: Cleans the dataset by handling missing values, dropping irrelevant features, engineering new features (e.g., fee buckets, time elapsed), and encoding categorical variables.
+
+### Classification
+
+- **`perform_classification`**: Implements multiple classifiers (Random Forest, XGBoost, Logistic Regression, K-Nearest Neighbors, Support Vector Machines).
+- **`train_and_evaluate_model`**: Trains models, evaluates accuracy, F1-Score, and cross-validation scores, and outputs performance metrics.
+- **`plot_comparison`**: Compares model accuracy and F1-Scores.
+- **`display_feature_importance`**: Visualizes the most influential features for models like Random Forest and XGBoost.
+
+### Clustering
+
+- **`perform_clustering`**: Conducts clustering analysis using K-Means, Hierarchical Clustering, and DBSCAN.
+
+### Anomaly Detection
+
+- **`perform_anomaly_detection`**: Identifies anomalies using Isolation Forest, Local Outlier Factor, and One-Class SVM.
 
 ## Repository Structure
 
-- `main.py`: Main script containing the pipeline implementation.
+- `classification_pipeline.py`: Script containing the pipeline implementation.
+- `feature_meaning.csv`: Describes the meaning of each feature in the dataset.
+- `requirements.txt`: List of required Python libraries.
 - `gemel_net_dataset.csv`: Dataset used for training and testing (not included in the repository; see below for details on dataset usage).
 
 ## Setup Instructions
@@ -51,58 +66,44 @@ Ensure you have Python 3.7+ installed along with the following libraries:
 1. Run the script:
 
    ```bash
-   python main.py
+   python classification_pipeline.py
    ```
 
 2. The script will preprocess the dataset, train multiple machine learning models, evaluate them, and visualize the results.
 
-3. Output includes:
+3. Outputs include:
    - Accuracy, F1-Score, and cross-validation accuracy for each model.
-   - A bar chart comparing model performance.
-   - A list and visualization of the top influential features for the XGBoost model.
-
-## Key Functions
-
-### Preprocessing
-
-The `preprocessing` function:
-- Drops irrelevant or redundant columns.
-- Fills missing values using median imputation.
-- Performs feature engineering to create meaningful new features.
-- Encodes categorical features using `LabelEncoder`.
-
-### Model Training and Evaluation
-
-The `train_and_evaluate_model` function:
-- Trains a specified model on the training data.
-- Evaluates the model on the test set using accuracy, F1-Score, and a classification report.
-- Conducts cross-validation for robust performance metrics.
-
-### Visualization
-
-- **`plot_comparison`**: Compares accuracy and F1-Score across models.
-- **`display_feature_importance`**: Displays and plots the most important features for the XGBoost model.
+   - Clustering results with visualizations.
+   - Anomaly detection results using multiple methods.
 
 ## Dataset
 
-The dataset used in this project is from the **GemelNet** project. It includes features related to financial fund performance, such as management fees, yields, and asset sizes. For privacy and licensing reasons, the dataset is not provided in this repository. Please refer to the official GemelNet dataset for more details.
+The dataset used in this project is from [Data.gov.il](https://info.data.gov.il/home/). It includes features related to financial fund performance, such as management fees, yields, and asset sizes. For privacy and licensing reasons, the dataset is not provided in this repository.
 
-## Future Enhancements
+## Results and Outputs
 
-- Add support for additional machine learning models.
-- Implement automated exploratory data analysis (EDA).
-- Extend feature engineering to capture more financial insights.
-- Integrate deep learning models for enhanced performance.
+### Classification
+
+XGBoost was found to be the best-performing model with an accuracy of **98%**. The most influential features identified are:
+- **Fee Bucket**: Classification of management fees.
+- **Sub Specialization of the Fund**: Detailed focus areas of the financial funds.
+- **Time Elapsed in Years**: The duration of the fund's existence.
+
+### Clustering
+
+Clustering analysis was performed using KMeans, Hierarchical Clustering, and DBSCAN. The results revealed distinct clusters of funds based on their attributes:
+- **KMeans** identified 3 optimal clusters based on the Elbow method.
+- **Hierarchical Clustering** provided a dendrogram representation, with similar grouping as KMeans.
+- **DBSCAN** detected 3 clusters, excluding noise points, with some outliers detected as noise.
+
+### Anomaly Detection
+
+Anomaly detection using Isolation Forest, Local Outlier Factor (LOF), and One-Class SVM revealed the following insights:
+- **Isolation Forest** detected 15 anomalies.
+- **LOF** and **One-Class SVM** identified 10 and 8 anomalies respectively.
+- The anomalies are primarily influenced by unusual values in features such as management fees and fund specialization.
 
 ## Author
 
-This repository is maintained by **Aron Bensimhon**. If you have any questions or feedback, feel free to contact me through GitHub.
-
-## License
-
-This project is licensed under the MIT License. See the `LICENSE` file for details.
-
-## Acknowledgments
-
-Special thanks to the GemelNet project for providing the dataset used in this analysis.
+This repository is maintained by **Aron Bensimhon** and **Moshe Goldzand**. If you have any questions or feedback, feel free to contact us through GitHub.
 
