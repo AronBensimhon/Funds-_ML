@@ -100,9 +100,9 @@ def plot_comparison(results):
     plt.title('Model Performance Comparison')  # Plot title
     plt.legend()  # Add legend
     plt.tight_layout()
-    # plt.show()
-    plt.savefig('graph_results/models_comparison.png')  # ChatGPT
-    plt.close()  # Close the plot after saving to prevent display
+    # plt.show() # Uncomment if you want to allow plot display, needs manual closing for the code to continue running.
+    # plt.savefig('graph_results/models_comparison.png')
+    plt.close()
 
 
 def display_feature_importance(model, feature_names, top_n=10):
@@ -128,7 +128,7 @@ def display_feature_importance(model, feature_names, top_n=10):
         plt.gca().invert_yaxis()  # Invert y-axis
         plt.tight_layout()
         # plt.show()
-        plt.savefig('graph_results/feature_importance.png')
+        # plt.savefig('graph_results/feature_importance.png')
         plt.close()
     else:
         print("The provided model does not support feature importance.")
@@ -212,7 +212,7 @@ def perform_clustering(X):
     plt.ylabel('WCSS (Within-Cluster Sum of Squares)')
     plt.grid()
     # plt.show()
-    plt.savefig('graph_results/elbow_method_res.png')
+    # plt.savefig('graph_results/elbow_method_res.png')
     plt.close()
 
     optimal_k = 3  # based on visual inspection of the elbow plot
@@ -232,7 +232,7 @@ def perform_clustering(X):
     plt.xlabel("Data Points or Clusters")
     plt.ylabel("Distance")
     # plt.show()
-    plt.savefig('graph_results/hierarchical_dendrogram.png')
+    # plt.savefig('graph_results/hierarchical_dendrogram.png')
     plt.close()
 
     optimal_threshold = 100  # based on dendrogram inspection
@@ -251,6 +251,26 @@ def perform_clustering(X):
     num_clusters_dbscan = len(np.unique(dbscan_labels[dbscan_labels != -1]))  # Exclude noise
     num_noise_points = np.sum(dbscan_labels == -1)
     print(f"DBSCAN: {num_clusters_dbscan} clusters found, {num_noise_points} noise points")
+    # ChatGPT: Plot the DBSCAN results
+    plt.figure(figsize=(10, 6))
+    unique_labels = set(dbscan_labels)
+    colors = [plt.cm.Spectral(each) for each in np.linspace(0, 1, len(unique_labels))]
+    for label, color in zip(unique_labels, colors):
+        if label == -1:
+            # Noise points
+            color = [0, 0, 0, 1]  # Black for noise
+        mask = (dbscan_labels == label)
+        plt.scatter(X[mask, 0], X[mask, 1], c=[color], label=f'Cluster {label}' if label != -1 else 'Noise')
+    plt.title("DBSCAN Clustering Results")
+    plt.xlabel("Feature 1")
+    plt.ylabel("Feature 2")
+    plt.legend()
+    plt.tight_layout()
+    # plt.show()
+
+    # Save the plot
+    plt.savefig('graph_results/dbscan_clusters.png')
+    plt.close()
 
     # Analyze cluster distribution
     kmeans_cluster_counts = pd.Series(kmeans_labels).value_counts()
@@ -273,7 +293,7 @@ def perform_clustering(X):
     plt.ylabel('Number of Clusters')
     plt.xlabel('Clustering Method')
     # plt.show()
-    plt.savefig('graph_results/clusters_comparison.png')
+    # plt.savefig('graph_results/clusters_comparison.png')
     plt.close()
     return {
         "KMeans": {
@@ -331,7 +351,7 @@ def perform_anomaly_detection(X, df):
     plt.ylabel('Number of Anomalies')
     plt.xlabel('Anomaly Detection Method')
     # plt.show()
-    plt.savefig('graph_results/anomalies_res.png')
+    # plt.savefig('graph_results/anomalies_res.png')
     plt.close()
 
     print("\nIdentifying Anomalies Using the Best Model")
@@ -375,7 +395,7 @@ def main():
 
     # # # CLASSIFICATION # # #
     # debug(X, X_scaled, y)
-    perform_classification(X, X_scaled, y)
+    # perform_classification(X, X_scaled, y)
 
     # # # #  UNSUPERVISED ANALYSIS  # # #
     print("\nApplying PCA for Dimensionality Reduction")
@@ -383,7 +403,7 @@ def main():
     X_pca = pca.fit_transform(X_scaled)
 
     perform_clustering(X_pca)
-    perform_anomaly_detection(X_pca, df_preprocessed)
+    # perform_anomaly_detection(X_pca, df_preprocessed)
 
 
 if __name__ == '__main__':
