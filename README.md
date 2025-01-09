@@ -110,6 +110,12 @@ Clustering analysis was performed using KMeans, Hierarchical Clustering, and DBS
 *Larger vertical distances indicate more distinct clusters, while shorter distances show similar data points merging.*
 
 - **DBSCAN** detected 3 clusters, excluding noise points, with some outliers detected as noise.
+The scatter plot below visualizes the clusters detected by the DBSCAN algorithm. Each cluster is represented by a unique color, while noise points (if any) are marked in black.
+
+![DBSCAN Clustering Results](graph_results/dbscan_clusters.png)
+
+*The DBSCAN clustering visualization highlights four distinct clusters with varying densities, while noise points, represented*
+*in black, are scattered across sparse regions, demonstrating the algorithm's effectiveness in identifying dense groups and outliers.*
 
 As we can see in the following graph:
 ![Clustering Methods Comparison](graph_results/clusters_comparison.png)
