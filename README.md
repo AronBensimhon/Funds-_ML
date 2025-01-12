@@ -83,7 +83,10 @@ Ensure you have Python 3.7+ installed along with the following libraries:
 
 ## Dataset
 
-The dataset used in this project is from [Data.gov.il](https://info.data.gov.il/home/). It includes features related to financial fund performance, such as management fees, yields, and asset sizes. For privacy and licensing reasons, the dataset is not provided in this repository.
+## Dataset
+
+The dataset used in this project is from the [Gemelnet Dataset](https://data.gov.il/dataset/gemelnet/resource/a30dcbea-a1d2-482c-ae29-8f781f5025fb) on [Data.gov.il](https://info.data.gov.il/home). It includes features related to financial fund performance, such as management fees, yields, and asset sizes.
+
 
 ## Results and Outputs
 
