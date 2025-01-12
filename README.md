@@ -87,8 +87,18 @@ The dataset used in this project is from [Data.gov.il](https://info.data.gov.il/
 
 ![Model Performance Comparison](graph_results/models_comparison.png)
 
+#### Results:
+| Model                  | Accuracy | F1-Score | Cross-Validation Mean Accuracy |
+|------------------------|----------|----------|---------------------------------|
+| Random Forest          | 98.01%   | 98.00%   | 98.32%                         |
+| XGBoost                | 99.00%   | 99.00%   | 98.34%                         |
+| Logistic Regression    | 71.71%   | 71.53%   | 71.59%                         |
+| K-Nearest Neighbors    | 85.79%   | 85.84%   | 82.17%                         |
+| Support Vector Machine | 74.89%   | 74.83%   | 73.70%                         |
 
-XGBoost was found to be the best-performing model with an accuracy of **98%**.
+
+
+XGBoost was found to be the best-performing model with an accuracy of **99%**, closely followed by Random Forest (98% accuracy).
 The following graph shows the top influential features for the XGBoost model:
 
 ![Feature Importance](graph_results/feature_importance.png)
@@ -102,14 +112,14 @@ Clustering analysis was performed using KMeans, Hierarchical Clustering, and DBS
 
 *The "elbow point" (where the reduction in WCSS becomes less significant) occurs at k=3, indicating that 3 clusters is the optimal* *choice for this dataset.*
 
-- **Hierarchical Clustering** provided a dendrogram representation, with similar grouping as KMeans.
+- **Hierarchical Clustering** provided a dendrogram representation.
 ![Hierarchical Clustering Dendrogram](graph_results/hierarchical_dendrogram.png)
 
 *The dendrogram shows how data points are merged into clusters step by step.*
 *A threshold around 100 on the y-axis suggests the dataset can be grouped into a few major clusters.*
 *Larger vertical distances indicate more distinct clusters, while shorter distances show similar data points merging.*
 
-- **DBSCAN** detected 3 clusters, excluding noise points, with some outliers detected as noise.
+- **DBSCAN** detected 4 clusters, excluding noise points, with some outliers detected as noise.
 The scatter plot below visualizes the clusters detected by the DBSCAN algorithm. Each cluster is represented by a unique color, while noise points (if any) are marked in black.
 
 ![DBSCAN Clustering Results](graph_results/dbscan_clusters.png)
@@ -123,14 +133,25 @@ Summary of clustering results in the following graph:
 ### Anomaly Detection
 
 Anomaly detection using Isolation Forest, Local Outlier Factor (LOF), and One-Class SVM revealed the following insights:
-- **Isolation Forest** detected 15 anomalies.
-- **LOF** and **One-Class SVM** identified 10 and 8 anomalies respectively.
-- The anomalies are primarily influenced by unusual values in features such as management fees and fund specialization.
+- **Isolation Forest** and **LOF** detected 54 anomalies.
+- **One-Class SVM** identified 61 anomalies.
+- The anomalies are primarily influenced by unusual values in features such as managing coroporation and fund classification.
 
 The following graph compares the number of anomalies detected by different methods:
 
 ![Anomalies Detected](graph_results/anomalies_res.png)
 
+### Recommender System
+- **`recommend_similar_funds`**: Recommends top N similar funds using content-based filtering and cosine similarity.
+
+#### How it works:
+The function targets performance-risk metrics such as Alpha, Sharpe Ratio, and Standard Deviation to recommend funds based on a performance-risk scale.
+
+#### Example Output:
+For the fund **'סלייס קופת גמל להשקעה אג"ח ללא מניות'**, the top 3 most similar funds are:
+- סלייס השתלמות כלל
+- קופת גמל עמ"י מסלול מניות
+- סלייס גמל קופת גמל לחסכון מדרגות עד 50
 ## Author
 
 This repository is maintained by **Aron Bensimhon** and **Moshe Goldzand**. If you have any questions or feedback, feel free to contact us through GitHub.
