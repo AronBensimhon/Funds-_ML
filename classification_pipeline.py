@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import random
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.ensemble import RandomForestClassifier
@@ -8,7 +9,6 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import classification_report, accuracy_score, f1_score
 from sklearn.preprocessing import LabelEncoder, StandardScaler
-from sklearn.impute import SimpleImputer
 from sklearn.model_selection import GridSearchCV
 from sklearn.svm import SVC
 from scipy.cluster.hierarchy import linkage, dendrogram, fcluster
@@ -17,24 +17,33 @@ from sklearn.cluster import KMeans, DBSCAN
 from sklearn.ensemble import IsolationForest
 from sklearn.neighbors import LocalOutlierFactor
 from sklearn.svm import OneClassSVM
+from sklearn.metrics.pairwise import cosine_similarity
 
 
 def preprocessing(df):
     """
-    Contains data cleaning (missing values, irrelevant features), feature engineering and encoding to prep the data for the model
+    Contains data cleaning (missing values, irrelevant features),
+    feature engineering and encoding to prep the data for the model.
     """
     drop_features = [  # Columns with excessive missing values or unnecessary for classification
         'AVG_DEPOSIT_FEE', 'ALPHA', 'YIELD_TRAILING_5_YRS',
         'AVG_ANNUAL_YIELD_TRAILING_5YRS', 'STANDARD_DEVIATION',
         'SHARPE_RATIO', 'YIELD_TRAILING_3_YRS', 'AVG_ANNUAL_YIELD_TRAILING_3YRS',
-        'MANAGING_CORPORATION_LEGAL_ID', 'CONTROLLING_CORPORATION', 'FUND_NAME', 'FUND_ID'
-    ]
+        'MANAGING_CORPORATION_LEGAL_ID', 'CONTROLLING_CORPORATION', 'FUND_ID']
     df = df.drop(columns=drop_features)
     df = df.dropna(subset=['MONTHLY_YIELD', 'YEAR_TO_DATE_YIELD'],
                    how='all')
-    num_features = ['AVG_ANNUAL_MANAGEMENT_FEE', 'MONTHLY_YIELD', 'YEAR_TO_DATE_YIELD']
-    df[num_features] = df[num_features].fillna(df[num_features].median())  # ChatGPT: Fill missing values with median
+    num_features = ['DEPOSITS', 'WITHDRAWLS', 'INTERNAL_TRANSFERS', 'NET_MONTHLY_DEPOSITS',
+                    'TOTAL_ASSETS', 'AVG_ANNUAL_MANAGEMENT_FEE', 'MONTHLY_YIELD',
+                    'YEAR_TO_DATE_YIELD', 'LIQUID_ASSETS_PERCENT', 'STOCK_MARKET_EXPOSURE',
+                    'FOREIGN_EXPOSURE', 'FOREIGN_CURRENCY_EXPOSURE']
+    for feature in num_features:
+        df[feature] = df.groupby('FUND_NAME')[feature].transform(lambda x: x.fillna(x.mean()))
+        # ChatGPT : Identify rows where the feature is still NaN after the group mean fill
+        invalid_groups = df.groupby('FUND_NAME')[feature].transform('mean').isnull()
+        df = df[~invalid_groups]
 
+    df = df.drop(columns='FUND_NAME')  # creates bias for the model since it contains info present in other features
     df['INCEPTION_DATE'] = pd.to_datetime(df['INCEPTION_DATE'], errors='coerce')
     df['REPORT_PERIOD'] = pd.to_datetime(df['REPORT_PERIOD'].astype(str), format='%Y%m')
     df['TIME_ELAPSED_YEARS'] = ((df['REPORT_PERIOD'] - df['INCEPTION_DATE']).dt.days.fillna(
@@ -43,8 +52,8 @@ def preprocessing(df):
     df = df.drop(columns=['INCEPTION_DATE', 'REPORT_PERIOD'])
 
     # # # FEATURE ENGINEERING # # #
-    fee_min = df['AVG_ANNUAL_MANAGEMENT_FEE'].min()
-    fee_max = df['AVG_ANNUAL_MANAGEMENT_FEE'].max()
+    fee_min = df['AVG_ANNUAL_MANAGEMENT_FEE'].min() - 0.01
+    fee_max = df['AVG_ANNUAL_MANAGEMENT_FEE'].max() + 0.01
 
     df['FEE_BUCKET'] = pd.cut(
         df['AVG_ANNUAL_MANAGEMENT_FEE'],
@@ -63,17 +72,17 @@ def preprocessing(df):
     return df, encoders
 
 
-def train_and_evaluate_model(model, X_train, y_train, X_test, y_test):
+def train_and_evaluate_model(model, x_train, y_train, x_test, y_test):
     """
-    Will be used to run several models with same script
+    Used to run several models with same script
     """
-    model.fit(X_train, y_train)
-    y_pred = model.predict(X_test)
+    model.fit(x_train, y_train)
+    y_pred = model.predict(x_test)
     accuracy = accuracy_score(y_test, y_pred)
     f1 = f1_score(y_test, y_pred, average='weighted')
     report = classification_report(y_test, y_pred)  # ChatGPT: print report of model
 
-    cross_val_scores = cross_val_score(model, X_train, y_train, cv=5, scoring='accuracy')  # Cross-validation
+    cross_val_scores = cross_val_score(model, x_train, y_train, cv=5, scoring='accuracy')  # Cross-validation
     cv_mean = cross_val_scores.mean()  # Mean cross-validation score
     return {
         "model": model,
@@ -86,7 +95,7 @@ def train_and_evaluate_model(model, X_train, y_train, X_test, y_test):
 
 def plot_comparison(results):
     """
-    :return: Plot of each model performance
+    Plot of each model performance
     """
     model_names = list(results.keys())
     accuracies = [metrics['accuracy'] for metrics in results.values()]
@@ -101,7 +110,7 @@ def plot_comparison(results):
     plt.legend()  # Add legend
     plt.tight_layout()
     # plt.show() # Uncomment if you want to allow plot display, needs manual closing for the code to continue running.
-    # plt.savefig('graph_results/models_comparison.png')
+    plt.savefig('graph_results/models_comparison.png')
     plt.close()
 
 
@@ -128,13 +137,13 @@ def display_feature_importance(model, feature_names, top_n=10):
         plt.gca().invert_yaxis()  # Invert y-axis
         plt.tight_layout()
         # plt.show()
-        # plt.savefig('graph_results/feature_importance.png')
+        plt.savefig('graph_results/feature_importance.png')
         plt.close()
     else:
         print("The provided model does not support feature importance.")
 
 
-def perform_classification(X, X_scaled, y):
+def run_classification(X, X_scaled, y):
     """
     1. GridSearch for parameter tuning
     2. Finding the best model based on accuracy
@@ -188,7 +197,7 @@ def perform_classification(X, X_scaled, y):
         display_feature_importance(best_xgboost_model, X.columns)
 
 
-def perform_clustering(X):
+def run_clustering(X):
     """
     1. Testing Kmeans, Hierarchical and DBSCAN
     2. Finding the best clustering model based on accuracy
@@ -212,7 +221,7 @@ def perform_clustering(X):
     plt.ylabel('WCSS (Within-Cluster Sum of Squares)')
     plt.grid()
     # plt.show()
-    # plt.savefig('graph_results/elbow_method_res.png')
+    plt.savefig('graph_results/elbow_method_res.png')
     plt.close()
 
     optimal_k = 3  # based on visual inspection of the elbow plot
@@ -232,14 +241,14 @@ def perform_clustering(X):
     plt.xlabel("Data Points or Clusters")
     plt.ylabel("Distance")
     # plt.show()
-    # plt.savefig('graph_results/hierarchical_dendrogram.png')
+    plt.savefig('graph_results/hierarchical_dendrogram.png')
     plt.close()
 
     optimal_threshold = 100  # based on dendrogram inspection
     hierarchical_labels = fcluster(linkage_matrix, t=optimal_threshold, criterion='distance')
     num_clusters_hierarchical = len(np.unique(hierarchical_labels))
-    print(
-        f"Number of clusters found using hierarchical clustering (height={optimal_threshold}): {num_clusters_hierarchical}")
+    print(f"Number of clusters found using hierarchical clustering"
+          f" (height={optimal_threshold}): {num_clusters_hierarchical}")
 
     # DBSCAN
     print("\nPerforming Hierarchical Clustering")
@@ -251,6 +260,7 @@ def perform_clustering(X):
     num_clusters_dbscan = len(np.unique(dbscan_labels[dbscan_labels != -1]))  # Exclude noise
     num_noise_points = np.sum(dbscan_labels == -1)
     print(f"DBSCAN: {num_clusters_dbscan} clusters found, {num_noise_points} noise points")
+
     # ChatGPT: Plot the DBSCAN results
     plt.figure(figsize=(10, 6))
     unique_labels = set(dbscan_labels)
@@ -267,8 +277,6 @@ def perform_clustering(X):
     plt.legend()
     plt.tight_layout()
     # plt.show()
-
-    # Save the plot
     plt.savefig('graph_results/dbscan_clusters.png')
     plt.close()
 
@@ -293,7 +301,7 @@ def perform_clustering(X):
     plt.ylabel('Number of Clusters')
     plt.xlabel('Clustering Method')
     # plt.show()
-    # plt.savefig('graph_results/clusters_comparison.png')
+    plt.savefig('graph_results/clusters_comparison.png')
     plt.close()
     return {
         "KMeans": {
@@ -315,7 +323,7 @@ def perform_clustering(X):
     }
 
 
-def perform_anomaly_detection(X, df):
+def run_anomaly_detection(X, df):
     """
     Perform anomaly detection using Isolation Forest, Local Outlier Factor (LOF), and One-Class SVM.
     Results include detection of anomalies, model comparison, and identification of anomalies in the raw dataset.
@@ -351,7 +359,7 @@ def perform_anomaly_detection(X, df):
     plt.ylabel('Number of Anomalies')
     plt.xlabel('Anomaly Detection Method')
     # plt.show()
-    # plt.savefig('graph_results/anomalies_res.png')
+    plt.savefig('graph_results/anomalies_res.png')
     plt.close()
 
     print("\nIdentifying Anomalies Using the Best Model")
@@ -381,30 +389,83 @@ def perform_anomaly_detection(X, df):
     }
 
 
+def recommend_similar_funds(df, fund_name, top_n=3):
+    """
+    Recommends the top N most similar funds using content-based filtering and cosine similarity. This function
+    targets performance-risk metrics such as alpha, sharpe ratio, and standard deviation to provide recommendations
+    based on a performance-risk scale.
+
+    Read more about Sharpe Ratio and Alpha here:
+    https://www.investopedia.com/ask/answers/021315/what-difference-between-sharpe-ratio-and-alpha.asp
+    """
+    num_features = ['ALPHA', 'STANDARD_DEVIATION', 'SHARPE_RATIO']
+    cat_feature = ['FUND_NAME']
+    df = df.dropna(subset=num_features, how='all').copy()
+    for feature in num_features:
+        df[feature] = df.groupby(cat_feature)[feature].transform(
+            lambda x: x.fillna(x.mean())
+        )
+    df[cat_feature] = df[cat_feature].fillna('Unknown')
+    df = df.drop_duplicates(subset='FUND_NAME', keep='first')
+    relevant_columns = num_features + cat_feature
+    df = df[relevant_columns].copy()
+    scaler = StandardScaler()
+    numerical_data = scaler.fit_transform(df[num_features])
+    categorical_data = pd.get_dummies(df[cat_feature])
+    combined_features = np.hstack([numerical_data, categorical_data.values])
+
+    # Compute cosine similarity
+    cosine_sim = cosine_similarity(combined_features)
+    similarity_df = pd.DataFrame(
+        cosine_sim, index=df['FUND_NAME'], columns=df['FUND_NAME']
+    )
+    if fund_name not in similarity_df.index:
+        raise ValueError(f"Fund name '{fund_name}' not found in the dataset.")
+
+    similarity_series = similarity_df.loc[fund_name]
+    similar_funds = (
+        similarity_series
+        .drop(fund_name, errors='ignore')  # Exclude the fund itself
+        .pipe(pd.Series.sort_values, ascending=False)  # Explicitly use pandas.Series.sort_values
+        .head(top_n)
+    )
+    return list(similar_funds.index)
+
+
 def main():
     df = pd.read_csv('gemel_net_dataset.csv')
 
     # # # PREPROCESSING # # #
+    print('\n===== Running preprocessing =====')
     df_preprocessed, label_encoders = preprocessing(df)
     X = df_preprocessed.drop(columns=['FUND_CLASSIFICATION'])
     y = df_preprocessed['FUND_CLASSIFICATION']
-    imputer = SimpleImputer(strategy="median")  # Handle missing values before fitting
-    X_imputed = imputer.fit_transform(X)
     scaler = StandardScaler()
-    X_scaled = scaler.fit_transform(X_imputed)
+    X_scaled = scaler.fit_transform(X)
 
-    # # # CLASSIFICATION # # #
-    # debug(X, X_scaled, y)
-    # perform_classification(X, X_scaled, y)
+    # # # # CLASSIFICATION # # #
+    print('\n===== Running classification model =====')
+    run_classification(X, X_scaled, y)
 
-    # # # #  UNSUPERVISED ANALYSIS  # # #
+    # # # # #  UNSUPERVISED ANALYSIS  # # #
+    print('\n===== Running unsupervised analysis =====')
     print("\nApplying PCA for Dimensionality Reduction")
     pca = PCA(n_components=10)
     X_pca = pca.fit_transform(X_scaled)
+    run_clustering(X_pca)
+    run_anomaly_detection(X_pca, df_preprocessed)
 
-    perform_clustering(X_pca)
-    # perform_anomaly_detection(X_pca, df_preprocessed)
+    # # # # RECOMMENDER SYSTEM # # #
+    print('\n===== Running recommender system =====')
+    funds = df['FUND_NAME'].unique().tolist()
+    fund_name = 'סלייס קופת גמל להשקעה אג"ח ללא מניות'
+    # fund name example, print(random.choice(funds)) to try another fund.
+    similar_funds = recommend_similar_funds(df, fund_name, top_n=3)
+    print(f"Top {len(similar_funds)} funds similar to '{fund_name}' are:")
+    for rec in similar_funds:
+        print(f"{rec}")
 
 
 if __name__ == '__main__':
     main()
+
