@@ -25,6 +25,10 @@ This project is organized into several key functions:
 
 - **`perform_anomaly_detection`**: Identifies anomalies using Isolation Forest, Local Outlier Factor, and One-Class SVM.
 
+### Recommender System
+
+- **`recommend_similar_funds`**: Recommends top N similar funds using content-based filtering and cosine similarity.
+
 ## Repository Structure
 
 - `classification_pipeline.py`: Script containing the pipeline implementation.
@@ -142,10 +146,10 @@ The following graph compares the number of anomalies detected by different metho
 ![Anomalies Detected](graph_results/anomalies_res.png)
 
 ### Recommender System
-- **`recommend_similar_funds`**: Recommends top N similar funds using content-based filtering and cosine similarity.
 
 #### How it works:
-The function targets performance-risk metrics such as Alpha, Sharpe Ratio, and Standard Deviation to recommend funds based on a performance-risk scale.
+The function targets performance-risk metrics such as Alpha, Sharpe Ratio, and Standard Deviation to recommend funds based on a performance-risk scale and 
+recommends the top N similar funds using content-based filtering and cosine similarity.
 
 #### Example Output:
 For the fund **'סלייס קופת גמל להשקעה אג"ח ללא מניות'**, the top 3 most similar funds are:
