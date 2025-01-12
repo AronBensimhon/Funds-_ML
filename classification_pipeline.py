@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-import random
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.ensemble import RandomForestClassifier
@@ -463,7 +462,7 @@ def main():
     similar_funds = recommend_similar_funds(df, fund_name, top_n=3)
     print(f"Top {len(similar_funds)} funds similar to '{fund_name}' are:")
     for rec in similar_funds:
-        print(f"{rec}")
+        print(rec)
 
 
 if __name__ == '__main__':
