@@ -35,6 +35,7 @@ This project is organized into several key functions:
 - `feature_meaning.csv`: Describes the meaning of each feature in the dataset.
 - `requirements.txt`: List of required Python libraries.
 - `gemel_net_dataset.csv`: Dataset used for training and testing (not included in the repository; see below for details on dataset usage).
+- graph_results : directory with the graphs displayed throughout the code
 
 ## Setup Instructions
 
