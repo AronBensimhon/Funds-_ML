@@ -165,6 +165,13 @@ For the fund **'סלייס קופת גמל להשקעה אג"ח ללא מניו�
 - סלייס השתלמות כלל
 - קופת גמל עמ"י מסלול מניות
 - סלייס גמל קופת גמל לחסכון מדרגות עד 50
+
+## Conclusion ##
+This project applied machine learning to classify and analyze Israeli pension funds, achieving high accuracy with models like XGBoost and Random Forest. Clustering methods revealed natural groupings, and anomaly detection identified outliers, providing valuable insights. A content-based recommendation system was developed to assist investors in making informed decisions.
+
+Future improvements include incorporating investment exposure analysis to refine clustering and anomaly detection and implementing a practical user interface to make the system accessible to a broader audience.
+
+
 ## Author
 
 This repository is maintained by **Aron Bensimhon** and **Moshe Goldzand**. If you have any questions or feedback, feel free to contact us through GitHub.
