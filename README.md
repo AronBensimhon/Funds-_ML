@@ -89,6 +89,11 @@ The dataset used in this project is from the [Gemelnet Dataset](https://data.gov
 
 
 ## Results and Outputs
+Visualization of the **class distribution** after preprocessing the raw data:
+
+![Class Distribution](graph_results/class_distribution.png)
+
+We can see some imbalance in the distribution, classes 5 and 4 being the dominant ones.
 
 ### Classification
 #### Model Performance Comparison
