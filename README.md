@@ -172,6 +172,10 @@ This project applied machine learning to classify and analyze Israeli pension fu
 Future improvements include incorporating investment exposure analysis to refine clustering and anomaly detection and implementing a practical user interface to make the system accessible to a broader audience.
 
 
+## Acknowledgment ##
+We extend our heartfelt gratitude to our course lecturer, Chen Hajaj, for his guidance, support, and invaluable insights throughout the project. His expertise greatly enriched our understanding and execution of this work.
+
+
 ## Author
 
 This repository is maintained by **Aron Bensimhon** and **Moshe Goldzand**. If you have any questions or feedback, feel free to contact us through GitHub.
