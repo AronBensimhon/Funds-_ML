@@ -71,6 +71,22 @@ def preprocessing(df):
     return df, encoders
 
 
+def identify_class_distribution(df):
+    class_counts = df['FUND_CLASSIFICATION'].value_counts()
+    plt.figure(figsize=(10, 6))
+    class_counts.plot(kind='bar', color='skyblue', edgecolor='black')
+    plt.title('Class Distribution in FUND_CLASSIFICATION', fontsize=16)
+    plt.xlabel('Class', fontsize=14)
+    plt.ylabel('Number of Instances', fontsize=14)
+    plt.xticks(rotation=0, fontsize=12)
+    plt.yticks(fontsize=12)
+    plt.grid(axis='y', linestyle='--', alpha=0.7)
+    plt.tight_layout()
+    plt.savefig('graph_results/class_distribution.png')
+    # plt.show()
+    return class_counts
+
+
 def train_and_evaluate_model(model, x_train, y_train, x_test, y_test):
     """
     Used to run several models with same script
@@ -437,6 +453,8 @@ def main():
     # # # PREPROCESSING # # #
     print('\n===== Running preprocessing =====')
     df_preprocessed, label_encoders = preprocessing(df)
+    distribution = identify_class_distribution(df_preprocessed)
+    print('\nClass distribution after preprocessing : ', distribution)
     X = df_preprocessed.drop(columns=['FUND_CLASSIFICATION'])
     y = df_preprocessed['FUND_CLASSIFICATION']
     scaler = StandardScaler()
